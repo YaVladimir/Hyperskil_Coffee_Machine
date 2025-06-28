@@ -1,17 +1,18 @@
 fun main() {
     val machine = CoffeeMachine()
-    machine.printState()
 
-    println("Write action (buy, fill, take):")
-    val action = readln()
+    while (true) {
+        println("Write action (buy, fill, take, remaining, exit):")
+        val action = readln()
 
-    when (action) {
-        "buy" -> buy(machine)
-        "fill" -> fill(machine)
-        "take" -> take(machine)
+        when (action) {
+            "buy" -> buy(machine)
+            "fill" -> fill(machine)
+            "take" -> take(machine)
+            "remaining" -> machine.printState()
+            "exit" -> return
+        }
     }
-
-    machine.printState()
 }
 
 class CoffeeMachine {
@@ -31,11 +32,36 @@ class CoffeeMachine {
     }
 
     fun sellCoffee(coffee: Coffee) {
-        water -= coffee.water
-        milk -= coffee.milk
-        coffeeBeans -= coffee.coffeeBeans
-        money += coffee.price
-        disposableCups--
+        when {
+            water < coffee.water -> {
+                println("Sorry, not enough water!")
+                return
+            }
+
+            milk < coffee.milk -> {
+                println("Sorry, not enough milk!")
+                return
+            }
+
+            coffeeBeans < coffee.coffeeBeans -> {
+                println("Sorry, not enough coffeeBeans")
+                return
+            }
+
+            disposableCups < 0 -> {
+                println("Sorry, not enough disposableCups")
+                return
+            }
+
+            else -> {
+                println("I have enough resources, making you a coffee!")
+                water -= coffee.water
+                milk -= coffee.milk
+                coffeeBeans -= coffee.coffeeBeans
+                money += coffee.price
+                disposableCups--
+            }
+        }
     }
 }
 
@@ -45,13 +71,14 @@ fun take(machine: CoffeeMachine) {
 }
 
 fun buy(machine: CoffeeMachine) {
-    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
-    val option = readln().toInt()
+    println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:")
+    val option = readln()
     machine.sellCoffee(
         when (option) {
-            1 -> Coffee.ESPRESSO
-            2 -> Coffee.LATTE
-            3 -> Coffee.CAPPUCCINO
+            "1" -> Coffee.ESPRESSO
+            "2" -> Coffee.LATTE
+            "3" -> Coffee.CAPPUCCINO
+            "back" -> return
             else -> throw IllegalArgumentException("Unexpected option")
         }
     )
